@@ -7,16 +7,16 @@ Use this reference only for explicit Skill development, evaluation, calibration-
 Resolve paths from the installed Skill root; do not store a machine-specific home path:
 
 ```text
-seedream-template-spec-v2/                 # current Skill root
-../../skill-testing/seedream-template-spec-v2/
+seedream-template-spec-v2-1/                 # current Skill root
+../../skill-testing/seedream-template-spec-v2-1/
 ```
 
-For an uninstalled workspace development copy, use <workspace>/skill-testing/seedream-template-spec-v2/ so the installed-layout relative path is not misresolved. For installed Skills, both directories live below the same Codex home. The Skill is replaceable package code; the testing corpus is persistent user data and must survive Skill reinstall or upgrade.
+For an uninstalled workspace development copy, use <workspace>/skill-testing/seedream-template-spec-v2-1/ so the installed-layout relative path is not misresolved. For installed Skills, both directories live below the same Codex home. The Skill is replaceable package code; the testing corpus is persistent user data and must survive Skill reinstall or upgrade.
 
 ## Corpus structure
 
 ```text
-seedream-template-spec-v2/
+seedream-template-spec-v2-1/
 ├── TESTING.md
 ├── cases/
 │   └── <case-slug>/

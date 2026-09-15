@@ -1,4 +1,4 @@
-# 快速上手 Seedream template spec skill v2
+# 快速上手 Seedream Template Spec 2.1
 
 
 ## 一、使用流程

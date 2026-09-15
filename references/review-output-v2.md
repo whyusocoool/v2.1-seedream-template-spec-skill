@@ -24,7 +24,7 @@ Criteria收敛度=`(MUST+PREFER)/(MUST+PREFER+待定+不规定)`；无关不进�
 模板可定义性是 UX 专用 REFERENCE 页。右侧结论显示“可定义”或“待补充”。页面直接显示上述判断规则、Criteria收敛度、收敛等级、有效Rule数量和Rule Set是否成立。图例显示 MUST、PREFER、待定、不规定、无关的加权数量；分色项按比例计入各状态。
 
 Definition首页分别显示一句话定义、Input和使用情景；右为一张典型参考图，并显示初版Rule表「Rule｜要求｜建议级别｜来自遍历项」。最后一列只显示C子项编号，不显示名称；MUST用绿色文字，PREFER用蓝色文字。UX确认/调整提示在表格之前。完整Prompt及Rules-Prompt映射从独立页面开始，并按映射段落自动续页。Prompt与Rules必须绘制为两个独立的PDF文本区域：先完整写入左侧Prompt，再写入右侧Rules；复制左栏时应得到连续且不夹杂Rule编号的Prompt正文，同时保持两栏逐行对齐。Prompt文本文件仍作为无格式复制的标准交付。
-2. `Criteria-Rules映射`作为REFERENCE紧邻Prompt章节之前；其下绘制29项状态图，左侧每行为C1-C5，标记数5/7/7/5/5，图表顶部按列统一显示数字1–7。图例直接放在该图下方。Prompt映射不再与29项矩阵竞争同一页。顶部数字和左侧行名使用粗体。标记使用由指定SVG路径形成的圆润方形，内部不显示文字，尺寸为旧标记的70%。五种用户可见状态为：MUST #97C657、PREFER #84AEF9、待定 #EDD154、不重要 #C9CBD0、无关为白底灰色 #9AA0A6 虚线描边。前三种与不重要标记不描边。同子项多个去向用形状内部左右分色，禁止使用无法独立解读的外附小点。
+2. 主文档不单独生成`Criteria-Rules映射`页。29项状态矩阵已经完整出现在后面的`模板可定义性（REFERENCE）`页，禁止为了章节完整性再次复制。Rules之后直接进入完整Prompt及Rules-Prompt映射。矩阵左侧每行为C1-C5，标记数5/7/7/5/5，图表顶部按列统一显示数字1–7，图例直接放在图下方。顶部数字和左侧行名使用粗体。标记使用由指定SVG路径形成的圆润方形，内部不显示文字，尺寸为旧标记的70%。五种用户可见状态为：MUST #97C657、PREFER #84AEF9、待定 #EDD154、不重要 #C9CBD0、无关为白底灰色 #9AA0A6 虚线描边。前三种与不重要标记不描边。同子项多个去向用形状内部左右分色，禁止使用无法独立解读的外附小点。
    黄色只表示需要UX取舍的规则提议。每个黄色项必须作为Rule表内的一行，使用与普通Rule完全一致的列、字号、行高与分隔线，仅整行增加浅黄色底色。该行提出具体候选Rule，或明确提出“不保留为Rule”的处理方案，并标明来源Criteria。不得另做黄色说明块，也不得把模型生成能力、缺少输入输出对照或待生图验证标成DEFINE待定。
 3. 全部Rule的简明评分卡，优先一页，先显示黑色MUST Rules标题和MUST表，再显示黑色PREFER Rules标题和PREFER表；UX审核稿和测试指南格式一致，不显示黄色提示框。Rule总数不得超过12条。两表均固定三列「Rule｜结果｜判断标准」。MUST结果列只写“通过/不通过”；PREFER结果列只写“2分/1分/0分”。每个结果及其对应标准必须独占同一水平行；结果列收窄。不通过和0分的结果与标准均为红色，1分均为橙色。FIT首页的单项Rules表现也拆成MUST Rules和PREFER Rules两表，Rule名称为黑色、表体白底；只将失败诊断中有对应测试图片的低分数字标红。失败诊断以小标题和表格放在首页底部。计算规则页使用较大表格字号；Gate表头已经说明统计对象后，单元格只写阈值或必要的人工作决策，不重复类别、MUST/PREFER名称，也不写“不作要求”。
 4. 测试材料：在「测试材料建议」大标题右侧显示灰色小字`以下为测试材料建议，供测试人员参考，不必严格执行`。面向用户统一显示`A 核心场景`、`B 拓展场景`、`C 边缘场景`，每组固定显示一行「输入范围」和一张「序号｜建议素材｜输入特征」表，再给6/6/4个具体内容方向。先用输入覆盖矩阵定义三类，至少覆盖输入类型、主体数量、主体类别、背景简杂、构图、遮挡、分辨率和轮廓清晰度，再由这些维度组合材料建议。材料项只描述要找什么素材及其输入特征，不得包含Rule编号、评分检查、Prompt修改、UX决策、「不臆造」等生成约束或执行说明；这些信息分别归入评分卡、Rules或Prompt。底层P0/P1/P2仅作旧数据兼容，不在报告显示。UX版和测试版均不显示材料提示框或页尾操作说明。生成器读取旧数据时应剥离这类尾注。
@@ -50,6 +50,7 @@ score0/1/2分别承载不满足、部分满足、满足描述；MUST在报告中
 ## 对话固定输出
 
 DEFINE初版交付：
+- 先单列`结果`，只放计算状态和完成情况；另设`UX 需要确认`，只放待决问题与下一步。不得把提醒、证据缺口或确认请求混入结果列表。
 - 模板概览：名称、一句定义、使用情景。
 - 一致性：状态、一句证据结论；覆盖数和一致性是不同指标。
 - 初版Rule表：编号、简短要求、MUST/PREFER/待确认。
@@ -67,6 +68,12 @@ Write the DEFINE summary as three short, non-overlapping lines:
 - `使用情景` states when or why a user would use the template.
 
 Keep each line independently understandable. Do not repeat the input in the output definition or restate the visual style in the usage scenario.
+
+## UX brief semantic gate
+
+Treat UX inputs as product intent, not ready-to-use Prompt copy. Before drafting Rules or Prompt, review the usage scenario for a concrete entry/need and intended user outcome. Phrases such as `一键进入动漫世界`, `更有氛围`, or `沉浸式体验` are slogans, not testable image instructions. Ask UX what visible output and transformation they mean, record the unresolved question under `goal.questions`, and stop before Prompt generation.
+
+The Prompt opening carries the highest task-setting weight. Start it with a concrete operation, input object, output medium/style, and essential preservation target—for example, `将输入照片转换为温暖复古的日系手绘动画画面，同时保持人物身份、主体数量和主要构图。` Do not place `让用户…`, `进入…世界`, product benefits, emotional promises, or other UX-facing copy in the Prompt. Later Prompt clauses must continue to express observable generation requirements mapped to Rules.
 
 ## Page header
 

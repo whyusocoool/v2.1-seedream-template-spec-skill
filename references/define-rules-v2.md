@@ -1,4 +1,4 @@
-# Seedream Template Spec v2：DEFINE 与 Rules 规范
+# Seedream Template Spec 2.1：DEFINE 与 Rules 规范
 
 > 修订2：新输出以 [review-output-v2.md](review-output-v2.md) 为准：初版允许待规则确认，MUST通过/不通过，固定紧凑报告，6/6/4材料建议。以下旧评分/计划/交付布局仅供旧数据兼容，不覆盖修订2。
 
