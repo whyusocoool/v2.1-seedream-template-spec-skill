@@ -1,9 +1,9 @@
 ---
-name: seedream-template-spec-v2
+name: seedream-template-spec-v2-1
 description: Define, test, tune, calibrate, and release a rule-driven local Seedream image template from 3–6 UX-selected golden references and staged user-supplied Seedream outputs. Use for a new template direction or an existing local case; do not use it to generate images or search for references.
 ---
 
-# Seedream Template Spec v2
+# Seedream Template Spec 2.1
 
 Help UX answer five questions: what the template should be, whether Seedream can do it, what currently fails, what is worth tuning versus calibrating, and whether the result is ready for users. Preserve DEFINE; continue through FIT, TUNE, CALIBRATE, and RELEASE only as evidence becomes available.
 
@@ -45,10 +45,11 @@ For an ordinary new template, use a project path supplied by the user. If none i
 Read [references/ux-define-quick-start.md](references/ux-define-quick-start.md) when explaining the workflow to UX. Treat DEFINE as one review loop with two named deliverables: `模板定义` for UX and `测试指南` for testers. Use these names consistently in user-facing messages:
 
 1. Collect the template name, intended use, accepted input, 3–6 golden references, and any known non-negotiable or allowed changes. Organize incomplete input instead of demanding a form.
-2. Analyze the references and all 29 Criteria, draft no more than 12 Rules, map them to an initial Prompt, and generate the first version of `模板定义` as `<模板名>_模板定义_to UX_v1.pdf`.
-3. Tell UX what the draft contains, what changed or remains uncertain, which yellow rows require a decision, and that the REFERENCE pages explain the Rule rationale and stay internal to UX.
-4. Apply feedback to the authoritative JSON, Rules, levels, Prompt, scorecard, and material coverage together. Generate v2, v3, and later `模板定义` PDFs as needed; never patch only the visible PDF or silently discard earlier decisions.
-5. Continue until UX explicitly says the definition is ready for testing. Resolve every yellow item before handoff. Then generate `测试指南` as `<模板名>_测试指南_to 测试.pdf`; this is the only DEFINE PDF sent to testers.
+2. Review the UX brief semantically before drafting. A slogan such as “一键进入动漫世界” does not specify a visible result: ask UX what concrete transformation and output they mean, store the question in `goal.questions`, and stop before Rules, Prompt, and PDF generation. Never copy product-facing benefit language into the Prompt.
+3. Analyze the references and all 29 Criteria, draft no more than 12 Rules, map them to an initial Prompt, and generate the first version of `模板定义` as `<模板名>_模板定义_to UX_v1.pdf`.
+4. Tell UX what the draft contains, what changed or remains uncertain, which yellow rows require a decision, and that only the pages explicitly labeled REFERENCE are appendices for UX context.
+5. Apply feedback to the authoritative JSON, Rules, levels, Prompt, scorecard, and material coverage together. Generate v2, v3, and later `模板定义` PDFs as needed; never patch only the visible PDF or silently discard earlier decisions.
+6. Continue until UX explicitly says the definition is ready for testing. Resolve every yellow item before handoff. Then generate `测试指南` as `<模板名>_测试指南_to 测试.pdf`; this is the only DEFINE PDF sent to testers.
 
 For every UX review revision, summarize the revision number, material changes, remaining decisions, and the single next action. Ask UX to review the whole document and answer yellow items first; yellow marks priority, not the only content requiring review. Do not treat silence, a general positive reaction, or approval of the visual direction as approval of every Rule and level.
 
@@ -64,7 +65,7 @@ python3 scripts/detect_stage.py <case-directory>
 
 Follow the earliest unmet dependency and the single reported action. Do not ask the user to select a mode, skip an invalid earlier stage, or infer that a report alone proves its JSON analysis exists. At every Seedream-generation pause, tell the user only which current materials to supply and where to place them.
 
-## DEFINE: v2 contract (specVersion 0.4)
+## DEFINE: 2.1 contract (specVersion 0.4)
 
 For new DEFINE work, read [references/define-rules-v2.md](references/define-rules-v2.md), [references/review-output-v2.md](references/review-output-v2.md), [references/traversal-v2.json](references/traversal-v2.json), and the Prompt guide. These files own the detailed Criteria, Rule thresholds, report layout, scoring, and A/B/C material rules; do not restate or invent parallel versions.
 
@@ -82,7 +83,7 @@ Preflight is an internal working pass, not another persisted artifact or user de
 
 ### One source for each fact
 
-Write each fact once in new v2 JSON:
+Write each fact once in new 2.1 JSON:
 
 - `traversal.findings` owns Criteria disposition, source location, rationale, and Rule links.
 - `rules` owns the requirement, priority, rubric, scope, and implementation. Do not write `rules[].evidence`; derive source evidence from linked traversal findings.
@@ -121,6 +122,8 @@ By default this creates both the internal generic artifact and the correctly nam
 Rules grounded in an explicit UX runtime or usage requirement may remain in `rules` and traversal even when the Golden References cannot visually demonstrate them. Record the UX source with `RUNTIME`, `USAGE`, or `GOAL`; omit that Rule from `reviewReport.ruleEvidence` until there is observable image support. The report will show the Rule as lacking independent image evidence and the quantitative assessment will not count it as qualified. This is not a builder defect and is not a reason to delete, weaken, or fabricate support for the requirement.
 
 Content precedes presentation. Finish the best Prompt supported by the Rules and the bundled Prompt guide before adapting the report. Every visual or behavioral Prompt clause must map to at least one Rule; several clauses may map to the same Rule's necessary conditions or supporting cues. Pure execution syntax may map to an existing input/output Rule or be recorded as CONFIG. Do not add ungrounded aesthetic instructions. Before and after PDF generation, verify that the canonical `seedreamPrompt` and exported Prompt text are byte-identical; layout work may paginate or move content but must never shorten, merge, paraphrase, or otherwise revise the Prompt.
+
+The Prompt is an execution specification, not a restatement of `usageScenario`. Its opening sentence must state a concrete transformation, input subject, output visual form, and the most important preservation target. Reject vague or user-facing phrases such as `让用户进入…世界`, `一键`, or `沉浸式体验`; if those phrases are the only available intent, return to UX clarification before authoring any Prompt.
 
 Use these deliverable names in user-facing messages:
 
@@ -192,7 +195,7 @@ Keep this a local UX decision skill. Do not add a web app, database, account sys
 
 Read [references/testing-corpus.md](references/testing-corpus.md) only when the user explicitly asks to develop or evaluate this Skill, maintain its reusable test corpus, or add a calibration case. Ordinary template creation and optimization do not use the corpus.
 
-Treat bundled `cases/` as immutable Skill-owned regression fixtures. For an explicit corpus task, keep reusable human testing cases outside the installable Skill at `../../skill-testing/seedream-template-spec-v2/`, relative to this Skill root.
+Treat bundled `cases/` as immutable Skill-owned regression fixtures. For an explicit corpus task, keep reusable human testing cases outside the installable Skill at `../../skill-testing/seedream-template-spec-v2-1/`, relative to this Skill root.
 
 Within an explicitly selected corpus, a case identifies one stable template direction and each independent attempt lives under `cases/<case-slug>/run-###/`. Preserve earlier runs and update corpus indexes only as part of that explicit corpus task.
 
