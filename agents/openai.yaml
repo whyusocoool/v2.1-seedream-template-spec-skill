@@ -1,4 +1,4 @@
 interface:
-  display_name: "Seedream Template Spec v2"
+  display_name: "Seedream Template Spec 2.1"
   short_description: "Define and test a Seedream template"
-  default_prompt: "Use $seedream-template-spec-v2 to help me define a new Seedream template from my UX inputs and golden references."
+  default_prompt: "Use $seedream-template-spec-v2-1 to help me define a new Seedream template from my UX inputs and golden references."
