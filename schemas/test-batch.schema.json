@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Seedream Test Batch V0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "batchId", "lineageId", "defineSpecSha256", "purpose", "model", "promptArtifact", "promptSha256", "fixedSetId", "ready", "cases"],
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "batchId": { "$ref": "#/$defs/id" },
+    "lineageId": { "$ref": "#/$defs/id" },
+    "defineSpecSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "purpose": { "enum": ["FIT", "TUNE_BASELINE", "REVISION_A", "REVISION_B", "FINAL_PATCH"] },
+    "model": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "promptArtifact": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "promptSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "fixedSetId": { "$ref": "#/$defs/id" },
+    "ready": { "type": "boolean" },
+    "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/case" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "pattern": "\\S" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "outputAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outputId", "path", "sha256"],
+      "properties": {
+        "outputId": { "$ref": "#/$defs/id" },
+        "path": { "type": "string", "minLength": 1, "pattern": "\\S" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "applicabilityTier", "inputAssets", "outputs"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/id" },
+        "applicabilityTier": { "enum": ["P0", "P1", "P2"] },
+        "inputText": { "type": "string", "pattern": "\\S" },
+        "inputAssets": { "type": "array", "items": { "$ref": "#/$defs/asset" } },
+        "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/outputAsset" } },
+        "notes": { "type": "string" }
+      },
+      "anyOf": [
+        { "required": ["inputText"] },
+        { "properties": { "inputAssets": { "minItems": 1 } } }
+      ]
+    }
+  }
+}

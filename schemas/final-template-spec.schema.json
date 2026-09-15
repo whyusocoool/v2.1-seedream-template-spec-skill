@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Seedream Final Template Spec V0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reportType", "schemaVersion", "templateName", "lineageId", "evidenceBatch", "testedPromptSha256", "finalTargetVisual", "finalVisualDNA", "coreConstraints", "preferenceConstraints", "validatedApplicability", "knownLimitations", "calibrationActions", "specChanges", "releaseCandidatePrompt", "release"],
+  "properties": {
+    "reportType": { "const": "FINAL_TEMPLATE_SPEC" },
+    "schemaVersion": { "const": "0.1" },
+    "templateName": { "$ref": "#/$defs/text" },
+    "lineageId": { "$ref": "#/$defs/id" },
+    "evidenceBatch": { "$ref": "#/$defs/id" },
+    "testedPromptSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "finalTargetVisual": { "$ref": "#/$defs/text" },
+    "finalVisualDNA": {
+      "type": "object", "additionalProperties": false,
+      "required": ["subject", "composition", "style", "colorLight", "graphicMaterial", "preserve"],
+      "properties": { "subject": { "$ref": "#/$defs/text" }, "composition": { "$ref": "#/$defs/text" }, "style": { "$ref": "#/$defs/text" }, "colorLight": { "$ref": "#/$defs/text" }, "graphicMaterial": { "$ref": "#/$defs/text" }, "preserve": { "$ref": "#/$defs/text" } }
+    },
+    "coreConstraints": {
+      "allOf": [
+        { "$ref": "#/$defs/constraintGroups" },
+        { "anyOf": [{ "properties": { "must": { "minItems": 1 } } }, { "properties": { "avoid": { "minItems": 1 } } }] }
+      ]
+    },
+    "preferenceConstraints": { "$ref": "#/$defs/constraintGroups" },
+    "validatedApplicability": { "$ref": "#/$defs/applicability" },
+    "knownLimitations": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "calibrationActions": { "type": "array", "items": { "$ref": "#/$defs/calibration" } },
+    "specChanges": { "type": "array", "items": { "$ref": "#/$defs/change" } },
+    "releaseCandidatePrompt": { "$ref": "#/$defs/text" },
+    "release": { "$ref": "#/$defs/release" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "release": { "properties": { "status": { "enum": ["PASS", "CONDITIONAL PASS"] } } } } },
+      "then": {
+        "properties": {
+          "release": {
+            "properties": {
+              "templateIdentity": { "properties": { "status": { "const": "PASS" } } },
+              "coreConstraints": { "properties": { "status": { "const": "PASS" } } },
+              "scenarioPerformance": { "properties": { "P0": { "properties": { "status": { "const": "PASS" } } } } }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "release": { "properties": { "status": { "const": "PASS" } } } } },
+      "then": { "properties": { "release": { "properties": { "scenarioPerformance": { "properties": { "P1": { "properties": { "status": { "const": "PASS" } } } } } } } } }
+    },
+    {
+      "if": { "properties": { "calibrationActions": { "contains": { "type": "object", "properties": { "action": { "const": "STOP" } }, "required": ["action"] } } } },
+      "then": { "properties": { "release": { "properties": { "status": { "const": "FAIL" } } } } }
+    }
+  ],
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "textArray": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "constraint": { "type": "object", "additionalProperties": false, "required": ["id", "text"], "properties": { "id": { "type": "string", "pattern": "^[MA][0-9]{2}$" }, "text": { "$ref": "#/$defs/text" } } },
+    "constraintGroups": {
+      "type": "object", "additionalProperties": false, "required": ["must", "avoid"],
+      "properties": {
+        "must": { "type": "array", "items": { "allOf": [{ "$ref": "#/$defs/constraint" }, { "properties": { "id": { "pattern": "^M[0-9]{2}$" } } }] } },
+        "avoid": { "type": "array", "items": { "allOf": [{ "$ref": "#/$defs/constraint" }, { "properties": { "id": { "pattern": "^A[0-9]{2}$" } } }] } }
+      }
+    },
+    "applicability": { "type": "object", "additionalProperties": false, "required": ["p0Advantage", "p1Supported", "p2NotRecommended"], "properties": { "p0Advantage": { "allOf": [{ "$ref": "#/$defs/textArray" }, { "minItems": 1 }] }, "p1Supported": { "allOf": [{ "$ref": "#/$defs/textArray" }, { "minItems": 1 }] }, "p2NotRecommended": { "allOf": [{ "$ref": "#/$defs/textArray" }, { "minItems": 1 }] } } },
+    "calibration": {
+      "type": "object", "additionalProperties": false, "required": ["action", "subject", "why"],
+      "properties": { "action": { "enum": ["KEEP", "RELAX", "NARROW APPLICABILITY", "STOP"] }, "subject": { "$ref": "#/$defs/text" }, "before": { "type": "string" }, "after": { "type": "string" }, "why": { "$ref": "#/$defs/text" } },
+      "allOf": [{ "if": { "properties": { "action": { "enum": ["RELAX", "NARROW APPLICABILITY"] } } }, "then": { "required": ["before", "after"] } }]
+    },
+    "change": { "type": "object", "additionalProperties": false, "required": ["area", "before", "after", "why"], "properties": { "area": { "$ref": "#/$defs/text" }, "before": { "$ref": "#/$defs/text" }, "after": { "$ref": "#/$defs/text" }, "why": { "$ref": "#/$defs/text" } } },
+    "scenarioGate": { "type": "object", "additionalProperties": false, "required": ["status", "evidence"], "properties": { "status": { "enum": ["PASS", "CONDITIONAL", "FAIL", "NOT SCORED"] }, "evidence": { "$ref": "#/$defs/text" } } },
+    "release": {
+      "type": "object", "additionalProperties": false, "required": ["status", "templateIdentity", "coreConstraints", "scenarioPerformance", "rationale"],
+      "properties": {
+        "status": { "enum": ["PASS", "CONDITIONAL PASS", "FAIL"] },
+        "templateIdentity": { "$ref": "#/$defs/scenarioGate" },
+        "coreConstraints": { "$ref": "#/$defs/scenarioGate" },
+        "scenarioPerformance": { "type": "object", "additionalProperties": false, "required": ["P0", "P1", "P2"], "properties": { "P0": { "$ref": "#/$defs/scenarioGate" }, "P1": { "$ref": "#/$defs/scenarioGate" }, "P2": { "$ref": "#/$defs/scenarioGate" } } },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

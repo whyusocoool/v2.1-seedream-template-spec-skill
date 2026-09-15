@@ -1,0 +1,26 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Seedream FIT UX Rule Review V0.1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schemaVersion","status","baseDefineSpecSha256","updatedDefineSpecSha256","failureDecisions","newSuggestions","organizedRuleChanges","uxSummary","uxConfirmed"],
+  "properties":{
+    "schemaVersion":{"const":"0.1"},
+    "status":{"enum":["DRAFT","CONFIRMED"]},
+    "baseDefineSpecSha256":{"$ref":"#/$defs/hash"},
+    "updatedDefineSpecSha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
+    "failureDecisions":{"type":"array","items":{"$ref":"#/$defs/failureDecision"}},
+    "newSuggestions":{"type":"array","items":{"$ref":"#/$defs/suggestion"}},
+    "organizedRuleChanges":{"type":"array","items":{"$ref":"#/$defs/change"}},
+    "uxSummary":{"$ref":"#/$defs/text"},
+    "uxConfirmed":{"type":"boolean"}
+  },
+  "$defs":{
+    "text":{"type":"string","minLength":1,"pattern":"\\S"},
+    "hash":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "priority":{"enum":["MUST","PREFERRED"]},
+    "failureDecision":{"type":"object","additionalProperties":false,"required":["failureId","decision","proposedPriority","rationale"],"properties":{"failureId":{"type":"string","pattern":"^F[0-9]{2}$"},"decision":{"enum":["RETAIN","MERGE","REMOVE"]},"proposedPriority":{"$ref":"#/$defs/priority"},"targetRuleId":{"type":"string","pattern":"^[RTV][0-9]{2,}$"},"rationale":{"$ref":"#/$defs/text"}}},
+    "suggestion":{"type":"object","additionalProperties":false,"required":["id","text","proposedPriority","disposition","rationale"],"properties":{"id":{"type":"string","pattern":"^U[0-9]{2}$"},"text":{"$ref":"#/$defs/text"},"proposedPriority":{"$ref":"#/$defs/priority"},"disposition":{"enum":["ADD_FAILURE","MERGE_RULE","REJECT"]},"targetRuleId":{"type":"string","pattern":"^[RTV][0-9]{2,}$"},"resultingFailureId":{"type":"string","pattern":"^F[0-9]{2}$"},"rationale":{"$ref":"#/$defs/text"}}},
+    "change":{"type":"object","additionalProperties":false,"required":["sourceIds","action","targetRuleId","priority","before","after","rationale"],"properties":{"sourceIds":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","pattern":"^[FU][0-9]{2}$"}},"action":{"enum":["ADD","MODIFY","MERGE","NO_CHANGE"]},"targetRuleId":{"type":"string","pattern":"^[RTV][0-9]{2,}$"},"priority":{"$ref":"#/$defs/priority"},"before":{"type":"string"},"after":{"$ref":"#/$defs/text"},"rationale":{"$ref":"#/$defs/text"}}}
+  }
+}

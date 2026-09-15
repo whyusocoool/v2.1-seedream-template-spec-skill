@@ -1,0 +1,947 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Seedream DEFINE v0.4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "specVersion",
+    "templateName",
+    "runtimeInput",
+    "runtimeInputInferred",
+    "usageScenario",
+    "targetVisual",
+    "references",
+    "heroReference",
+    "goal",
+    "traversal",
+    "rules",
+    "promptGuideReview",
+    "initialApplicability",
+    "fitTestPlan",
+    "tuneTestPlan",
+    "promptVersion",
+    "seedreamPrompt",
+    "promptRuleMap"
+  ],
+  "properties": {
+    "specVersion": {
+      "const": "0.4"
+    },
+    "templateName": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "runtimeInput": {
+      "enum": [
+        "Text only",
+        "Single image",
+        "Multiple images"
+      ]
+    },
+    "runtimeInputInferred": {
+      "type": "boolean"
+    },
+    "inputSummary": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "usageScenario": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "targetVisual": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "caption"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^REF[0-9]{2,}$"
+          },
+          "caption": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        }
+      },
+      "minItems": 3,
+      "maxItems": 6
+    },
+    "heroReference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "mustPreserve",
+        "allowedVariation",
+        "scope",
+        "questions",
+        "uxConfirmation"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "DRAFT",
+            "CONFIRMED"
+          ]
+        },
+        "mustPreserve": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "minItems": 1
+        },
+        "allowedVariation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "minItems": 0
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "minItems": 0
+        },
+        "uxConfirmation": {
+          "type": "string"
+        }
+      }
+    },
+    "traversal": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "checkId",
+          "findings"
+        ],
+        "properties": {
+          "checkId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "observation",
+                "sources",
+                "decision",
+                "ruleIds",
+                "reason"
+              ],
+              "properties": {
+                "observation": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "sourceId",
+                      "location",
+                      "claim",
+                      "kind"
+                    ],
+                    "properties": {
+                      "sourceId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "location": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "claim": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "kind": {
+                        "enum": [
+                          "OBSERVED",
+                          "UX",
+                          "INFERRED"
+                        ]
+                      }
+                    }
+                  },
+                  "minItems": 0
+                },
+                "decision": {
+                  "enum": [
+                    "RULE",
+                    "EVIDENCE",
+                    "OMIT",
+                    "NOT_APPLICABLE",
+                    "UNOBSERVABLE",
+                    "PENDING_UX"
+                  ]
+                },
+                "ruleIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^R[0-9]{2,}$"
+                  },
+                  "minItems": 0
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                }
+              }
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "rules": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "category",
+          "name",
+          "text",
+          "priority",
+          "retentionReason",
+          "priorityReason",
+          "checkScope",
+          "allowedVariation",
+          "necessaryConditions",
+          "supportingCues",
+          "score2",
+          "score1",
+          "score0",
+          "unobservableWhen",
+          "notApplicableWhen",
+          "dependsOn",
+          "implementation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^R[0-9]{2,}$"
+          },
+          "category": {
+            "enum": [
+              "C1",
+              "C2",
+              "C3",
+              "C4",
+              "C5"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "priority": {
+            "enum": [
+              "MUST",
+              "PREFERRED"
+            ]
+          },
+          "retentionReason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "priorityReason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "sourceId",
+                "location",
+                "claim",
+                "kind"
+              ],
+              "properties": {
+                "sourceId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "location": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "claim": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "kind": {
+                  "enum": [
+                    "OBSERVED",
+                    "UX",
+                    "INFERRED"
+                  ]
+                }
+              }
+            },
+            "minItems": 1
+          },
+          "checkScope": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "allowedVariation": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "necessaryConditions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "minItems": 1
+          },
+          "supportingCues": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "minItems": 0
+          },
+          "score2": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "score1": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "score0": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "unobservableWhen": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "notApplicableWhen": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^R[0-9]{2,}$"
+            },
+            "minItems": 0
+          },
+          "implementation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "method",
+              "detail"
+            ],
+            "properties": {
+              "method": {
+                "enum": [
+                  "PROMPT",
+                  "CONFIG",
+                  "REFERENCE",
+                  "UNVERIFIED"
+                ]
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      },
+      "minItems": 0
+    },
+    "promptGuideReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "targetModel",
+        "sourceStatus",
+        "reviewNote"
+      ],
+      "properties": {
+        "path": {
+          "const": "references/seedream-prompt-guide.md"
+        },
+        "targetModel": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "sourceStatus": {
+          "enum": [
+            "LOCAL_ONLY",
+            "OFFICIAL_VERIFIED"
+          ]
+        },
+        "reviewNote": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "initialApplicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "p0Advantage",
+        "p1Supported",
+        "p2BoundaryNotRecommended"
+      ],
+      "properties": {
+        "status": {
+          "const": "INITIAL_HYPOTHESIS"
+        },
+        "p0Advantage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "rationale"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "p1Supported": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "rationale"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "p2BoundaryNotRecommended": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "rationale"
+            ],
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      }
+    },
+    "fitTestPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "rows"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "testId",
+              "tier",
+              "inputDescription",
+              "challengeVariable",
+              "inputCount",
+              "runsPerInput",
+              "totalOutputs"
+            ],
+            "properties": {
+              "testId": {
+                "type": "string",
+                "pattern": "^P[0-2]-[0-9]{2}$"
+              },
+              "tier": {
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2"
+                ]
+              },
+              "inputDescription": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "challengeVariable": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "inputCount": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "runsPerInput": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "totalOutputs": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "tuneTestPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "rows"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "testId",
+              "tier",
+              "inputDescription",
+              "challengeVariable",
+              "inputCount",
+              "runsPerInput",
+              "totalOutputs"
+            ],
+            "properties": {
+              "testId": {
+                "type": "string",
+                "pattern": "^P[0-2]-[0-9]{2}$"
+              },
+              "tier": {
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2"
+                ]
+              },
+              "inputDescription": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "challengeVariable": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "inputCount": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "runsPerInput": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "totalOutputs": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "promptVersion": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "seedreamPrompt": {
+      "type": "string"
+    },
+    "promptRuleMap": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sentence",
+          "ruleIds"
+        ],
+        "properties": {
+          "sentence": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "ruleIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^R[0-9]{2,}$"
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "minItems": 0
+    },
+    "reviewReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "ruleStatus",
+        "uxConfirmation",
+        "confirmationRequest",
+        "pendingRuleIds",
+        "ruleEvidence",
+        "variations",
+        "testMaterials"
+      ],
+      "properties": {
+        "version": {
+          "const": "2"
+        },
+        "ruleStatus": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "CONFIRMED"
+          ]
+        },
+        "uxConfirmation": {
+          "type": "string"
+        },
+        "confirmationRequest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pendingRuleIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "variations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text",
+              "checkIds",
+              "reason"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "checkIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "testMaterials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tier",
+              "definition",
+              "items"
+            ],
+            "properties": {
+              "tier": {
+                "type": "string",
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2"
+                ]
+              },
+              "definition": {
+                "type": "string",
+                "minLength": 1
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 4,
+                "maxItems": 6
+              }
+            }
+          }
+        },
+        "ruleEvidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "checkIds",
+              "ruleIds",
+              "evidence",
+              "conclusion"
+            ],
+            "properties": {
+              "checkIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "ruleIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "refId",
+                    "score",
+                    "observation"
+                  ],
+                  "properties": {
+                    "refId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "score": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2
+                    },
+                    "observable": {
+                      "type": "boolean"
+                    },
+                    "observation": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              },
+              "conclusion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "referenceConsistency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "summary",
+            "conflicts"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "PASS",
+                "FAIL"
+              ]
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "conflicts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "checkId",
+                  "referenceIds",
+                  "description"
+                ],
+                "properties": {
+                  "checkId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "referenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 2,
+                    "uniqueItems": true
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
