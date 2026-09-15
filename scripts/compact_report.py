@@ -226,23 +226,23 @@ def definition_html(s,uris,final_define=False):
  base_rules=rule_rows(s);proposals=pending_proposal_rows(s)
  a=header(s,uris,True)+'<h2>初版 Rules · '+('待 UX 确认' if s['reviewReport']['ruleStatus']=='DRAFT' else '已确认')+'</h2>'+callout_html(confirmation(s))+table_html(['Rule','要求','建议级别','来自遍历项'],base_rules+proposals,len(base_rules) if proposals else None)
  a+='<h2>初版 Prompt '+h(s['promptVersion'])+'</h2><pre class="prompt-bg">'+h(s['seedreamPrompt'])+'</pre><p class="small">依据 Skill 内置 Seedream Prompt 指南 2026-09-10.1；'+h(s['promptGuideReview']['targetModel'])+'。尚未实测。</p>'
- b='<p class="reference-label">REFERENCE</p><h2>1 Criteria-Rules映射</h2>'+dots_svg(s)+legend_html()+'<h2>2 Rules-Prompt映射</h2>'+table_html(['Prompt','Rules'],[[m['sentence'],' / '.join(m['ruleIds'])] for m in s['promptRuleMap']])
+ b='<h2>Rules-Prompt映射</h2>'+table_html(['Prompt','Rules'],[[m['sentence'],' / '.join(m['ruleIds'])] for m in s['promptRuleMap']])
  c=callout_html(SCORE_NOTE)+'<h2>MUST Rules</h2>'+scoring_table_html(s,'MUST')+'<h2>PREFER Rules</h2>'+scoring_table_html(s,'PREFERRED')
  d=''
  for t in s['reviewReport']['testMaterials']:
   d+='<h2>'+h(TIER_LABELS[t['tier']])+'</h2>'+p('输入范围：'+t['definition'])+table_html(['序号','建议素材','输入特征'],material_rows(t))
- return CSS+page(s['templateName']+' · DEFINE 初版',a)+page('Criteria-Rules-Prompt映射',b)+page('测试评分卡',c)+page('测试材料',d)+reference_page(table_html(['一级 Criteria','子项编号','检查项','观察或判断内容'],appendix_rows()))
+ return CSS+page(s['templateName']+' · DEFINE 初版',a)+page('Prompt 与 Rules 映射',b)+page('测试评分卡',c)+page('测试材料',d)+reference_page(table_html(['一级 Criteria','子项编号','检查项','观察或判断内容'],appendix_rows()))
 
 
 def chat_summary(s):
     assessment=definition_assessment(s)
     lines=['**'+s['templateName']+'**',s['targetVisual'],'使用情景：'+s['usageScenario'],
-           '**模板可定义性：'+('可定义' if assessment['definable'] else '待补充')+'。** 收敛度 '+format(assessment['convergence']*100,'.1f')+'%，有效 Rules '+str(len(assessment['qualifiedRuleIds']))+' 条。',
-           '> '+confirmation(s),
+           '**结果**\n\n- 模板状态：'+('可定义' if assessment['definable'] else '待补充')+'\n- Criteria 收敛度：'+format(assessment['convergence']*100,'.1f')+'%\n- 有效 Rules：'+str(len(assessment['qualifiedRuleIds']))+' 条',
+           '**UX 需要确认**\n\n> '+confirmation(s),
            '| Rule | 初版要求 | 建议级别 | 来自遍历项 |','| --- | --- | --- | --- |']
     lines+=['| '+' | '.join(row)+' |' for row in rule_rows(s)]
     lines+=['初版 Prompt '+s['promptVersion']+'：','```text',s['seedreamPrompt'],'```','依据本地 Seedream 指南；'+s['promptGuideReview']['reviewNote'],'状态：尚未进行 Seedream 生图测试。']
-    return '\n\n'.join(lines[:4])+'\n\n'+'\n'.join(lines[4:])+'\n'
+    return '\n\n'.join(lines[:5])+'\n\n'+'\n'.join(lines[5:])+'\n'
 
 def export_pdf(s,refs,out,font,include_examples=False,revision=1):
  from reportlab.pdfgen import canvas
@@ -501,16 +501,6 @@ def export_pdf(s,refs,out,font,include_examples=False,revision=1):
  u.title('Rules依据');u.table(['Rules','效果描述','图片依据','Criteria依据'],rules_basis_rows(s),[78,118,112,211],7.5);u.finish()
  d=Doc('template-definition-report.pdf',header_label='DEFINE');d.start(s['templateName']+' · 模板定义');top(d,True)
  d.title('初版 Rules · '+('待 UX 确认' if s['reviewReport']['ruleStatus']=='DRAFT' else '已确认'));base_rules=rule_rows_ids(s);proposals=pending_proposal_rows(s);d.table(['Rule','要求','建议级别'],[[row[0],row[1],row[2]] for row in base_rules+proposals],[42,405,72],7.6,pending_from=len(base_rules) if proposals else None)
- d.start('Criteria-Rules映射','REFERENCE');rows={r['checkId']:r for r in s['traversal']};start=d.y
- for j in range(7):
-  x=left+151+j*51;d.c.setFont('ReportCJKBold',7.5);d.c.setFillColor(colors.HexColor('#526171'));d.c.drawCentredString(x,start-3,str(j+1))
- for i,g in enumerate(GROUPS.values()):
-  y=start-26-i*37;d.c.setFont('ReportCJKBold',9);d.c.setFillColor(colors.HexColor('#243746'));d.c.drawString(left,y-3,g['id']+' '+g['name'])
-  for j,ch in enumerate(g['checks']):
-   x=left+151+j*51;states,u=check_disposition(s,rows[ch['id']]);draw_squircle(d.c,x,y,states[0] if states else 'NOT_APPLICABLE',9.1)
-   if len(states)>1:
-    d.c.saveState();clip=d.c.beginPath();clip.rect(x,y-10,10,20);d.c.clipPath(clip,stroke=0,fill=0);draw_squircle(d.c,x,y,states[1],9.1);d.c.restoreState()
- d.y=start-206;draw_legend(d)
  d.prompt_mapping_pages(s['promptRuleMap'],9.8,'初始 Prompt v1.0','DEFINE')
  d.start('测试评分卡');d.title('MUST Rules');d.scoring_table(s,'MUST');d.title('PREFER Rules');d.scoring_table(s,'PREFERRED')
  d.start('测试材料建议',title_note='以下为测试材料建议，供测试人员参考，不必严格执行')

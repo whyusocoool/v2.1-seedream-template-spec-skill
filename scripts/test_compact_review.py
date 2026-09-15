@@ -2,8 +2,8 @@
 import unittest,copy,tempfile
 from pathlib import Path
 from test_define_v04 import fixture
-from define_v04 import validate,ready,consistency_passed,check_disposition
-from compact_report import definition_html,alignment_html,scoring_rows,consistency_rows,rule_rows,dots_svg,appendix_rows,chat_summary,core_rows,variation_rows,pending_rows,pending_proposal_rows,material_item_parts,resolve_font_pair,resolve_reference_paths,content_budget_issues
+from define_v04 import validate,ready,consistency_passed,check_disposition,ambiguous_usage_scenario,prompt_opening_issue
+from compact_report import definition_html,alignment_html,scoring_rows,consistency_rows,rule_rows,dots_svg,legend_html,appendix_rows,chat_summary,core_rows,variation_rows,pending_rows,pending_proposal_rows,material_item_parts,resolve_font_pair,resolve_reference_paths,content_budget_issues
 
 def sample():
  s=fixture();base=s['rules'][0];extra=[]
@@ -62,6 +62,17 @@ class ReviewTests(unittest.TestCase):
   s=sample();text=definition_html(s,['x']*4);self.assertLess(text.index('请 UX 确认'),text.index('<table>'))
  def test_chat_rule_table_has_origin_column_and_prior_action(self):
   s=sample();text=chat_summary(s);self.assertIn('| Rule | 初版要求 | 建议级别 | 来自遍历项 |',text);self.assertLess(text.index('请 UX 确认'),text.index('| Rule |'))
+ def test_chat_separates_results_from_ux_actions(self):
+  text=chat_summary(sample());self.assertIn('**结果**',text);self.assertIn('**UX 需要确认**',text);self.assertLess(text.index('**结果**'),text.index('**UX 需要确认**'))
+ def test_standalone_criteria_rule_map_page_is_not_duplicated(self):
+  text=definition_html(sample(),['x']*4);self.assertNotIn('Criteria-Rules-Prompt映射',text);self.assertIn('Prompt 与 Rules 映射',text)
+ def test_vague_usage_is_blocked_before_prompt(self):
+  self.assertTrue(ambiguous_usage_scenario('保留画面特征，一键进入动漫世界'))
+  s=sample();s['usageScenario']='保留画面特征，一键进入动漫世界'
+  with self.assertRaisesRegex(ValueError,'clarification question'):validate(s)
+ def test_vague_prompt_opening_is_rejected(self):
+  self.assertIn('vague',prompt_opening_issue('将照片转成动画，让用户进入动漫世界。保留人物。'))
+  self.assertEqual(prompt_opening_issue('将输入照片转换为温暖复古的日系手绘动画画面，同时保持人物身份和主要构图。'),'')
  def test_standard_checklist_has_group_and_three_detail_columns(self):
   rows=appendix_rows();self.assertEqual(len(rows),29);self.assertTrue(all(len(row)==4 and row[1] and row[2] and row[3] for row in rows));self.assertEqual([r[0] for r in rows if r[0]],['C1 内容与保留','C2 形态与组织','C3 视觉表现','C4 输入适配','C5 成品可用性'])
  def test_multistate_dot_uses_split_shape_not_satellite_dot(self):
@@ -69,7 +80,7 @@ class ReviewTests(unittest.TestCase):
  def test_exclude_and_not_applicable_have_distinct_states(self):
   s=sample();excluded=next(x for x in s['traversal'] if x['checkId']=='C1.01');excluded['findings'][0]['decision']='OMIT';na=next(x for x in s['traversal'] if x['checkId']=='C1.02');self.assertEqual(check_disposition(s,excluded)[0],['EXCLUDE']);self.assertEqual(check_disposition(s,na)[0],['NOT_APPLICABLE'])
  def test_user_facing_unrelated_marker_is_dashed(self):
-  s=sample();svg=dots_svg(s);self.assertIn('stroke="#9aa0a6"',svg);self.assertIn('stroke-dasharray="3 2"',svg);self.assertIn('border:1px dashed #9aa0a6',definition_html(s,['x']*4));self.assertIn('>无关</span>',definition_html(s,['x']*4));self.assertIn('>不规定</span>',definition_html(s,['x']*4))
+  s=sample();svg=dots_svg(s);self.assertIn('stroke="#9aa0a6"',svg);self.assertIn('stroke-dasharray="3 2"',svg);legend=legend_html();self.assertIn('border:1px dashed #9aa0a6',legend);self.assertIn('>无关</span>',legend);self.assertIn('>不规定</span>',legend)
  def test_font_resolution_does_not_require_deng_bold(self):
   regular,bold=resolve_font_pair(__file__);self.assertEqual(regular,__file__);self.assertEqual(bold,__file__)
  def test_reference_resolution_accepts_documented_golden_names(self):

@@ -13,6 +13,27 @@ GROUPS = {x['id']: x for x in CATALOG['groups']}
 CHECKS = {c['id']: c['name'] for g in GROUPS.values() for c in g['checks']}
 SCHEMA = json.loads((ROOT / 'schemas/template-spec-v04.schema.json').read_text())
 
+VAGUE_USAGE_PATTERNS = (
+    r'一键', r'进入.{0,10}(?:世界|氛围|感觉|体验)', r'沉浸(?:式)?(?:进入|体验)',
+    r'焕然一新', r'更有(?:感觉|氛围|故事感)',
+)
+VAGUE_PROMPT_PATTERNS = VAGUE_USAGE_PATTERNS + (r'让用户', r'为用户带来',)
+
+
+def ambiguous_usage_scenario(text):
+    """Flag slogan-like UX wording that does not define a testable image outcome."""
+    return any(re.search(pattern, text or '') for pattern in VAGUE_USAGE_PATTERNS)
+
+
+def prompt_opening_issue(prompt):
+    """The opening must specify the concrete transformation, not repeat UX marketing copy."""
+    opening = re.split(r'[。！？\n]', (prompt or '').strip(), maxsplit=1)[0]
+    if not opening:
+        return 'Prompt opening is empty'
+    if any(re.search(pattern, opening) for pattern in VAGUE_PROMPT_PATTERNS):
+        return 'Prompt opening contains vague UX/marketing language: '+opening
+    return ''
+
 
 def structural(value, schema, path='$'):
     """Validate the deliberately small JSON Schema subset used by v0.4."""
@@ -60,6 +81,11 @@ def validate(spec):
     checks = [x['checkId'] for x in spec['traversal']]
     if len(checks) != len(set(checks)) or set(checks) != set(CHECKS): raise ValueError('traversal must cover every fixed check exactly once')
     confirmation = spec['goal']['uxConfirmation'].strip()
+    if ambiguous_usage_scenario(spec['usageScenario']):
+        if not spec['goal']['questions']:
+            raise ValueError('ambiguous usage scenario needs a concrete UX clarification question before Prompt drafting')
+        if spec['seedreamPrompt'].strip():
+            raise ValueError('do not draft Prompt while the usage scenario is still ambiguous')
     if spec['goal']['status'] == 'CONFIRMED' and not confirmation: raise ValueError('confirmed goal needs actual UX confirmation evidence')
     if spec['goal']['status'] == 'DRAFT' and confirmation: raise ValueError('draft goal cannot claim UX confirmation')
     def sources(items):
@@ -102,6 +128,8 @@ def validate(spec):
         if not set(mapping['ruleIds']) <= rules.keys() or len(mapping['ruleIds']) != len(set(mapping['ruleIds'])): raise ValueError('invalid Prompt mapping')
         if mapping['sentence'] not in spec['seedreamPrompt']: raise ValueError('mapping text is absent from Prompt')
         mapped.update(mapping['ruleIds'])
+    opening_issue = prompt_opening_issue(spec['seedreamPrompt']) if spec['seedreamPrompt'].strip() else ''
+    if opening_issue: raise ValueError(opening_issue)
     if ready(spec):
         if not rules or not spec['seedreamPrompt'].strip(): raise ValueError('ready DEFINE requires Rules and Prompt')
         if {r['id'] for r in rules.values() if r['implementation']['method'] == 'PROMPT'} - mapped:
